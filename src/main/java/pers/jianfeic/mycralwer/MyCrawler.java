@@ -1,25 +1,26 @@
 package pers.jianfeic.mycralwer;
 
+import static pers.jianfeic.mycralwer.ConfigParams.restrictDomain;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
-
-import static pers.jianfeic.mycralwer.ConfigParams.*;
+import pers.jianfeic.util.RegexMatcher;
+import pers.jianfeic.util.csvio.CSVResultWrite;
 
 /**
  * My crawler extends from crawler4j
  *
  */
 public class MyCrawler extends WebCrawler {
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(js|css|png|gif|jpg|mp3|mp4|zip|gz))$");
-	private static int numOfPage = 0;
+	// private final static Pattern FILTERS = Pattern.compile(ConfigParams.ACCEPT_FILES);
+	private static int idOfPage = 0;
 	
 	/**
      * Creates a new crawler instance.
@@ -48,7 +49,8 @@ public class MyCrawler extends WebCrawler {
 	public boolean shouldVisit(Page referringPage, WebURL url) {
 		String href = url.getURL().toLowerCase();
 		// no filters type files and only within the designated domain
-		return !FILTERS.matcher(href).matches() && href.startsWith(restrictDomain);
+		// return !FILTERS.matcher(href).matches() && href.startsWith(restrictDomain);
+		return href.startsWith(restrictDomain);
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class MyCrawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
-		System.out.println("Now it's visiting No. " + numOfPage++ + "page.");
+		System.out.println("Now it's visiting No. " + idOfPage++ + " page.");
 		String url = page.getWebURL().getURL();
         System.out.println("URL: " + url);
 
@@ -68,7 +70,13 @@ public class MyCrawler extends WebCrawler {
             // Storage the html file
             System.out.println(page.getContentType());
             if (page.getContentType().startsWith("text/html")) {
-            	writeHTML(html, ConfigParams.storageFolder + "/" + htmlParseData.getTitle() + numOfPage + ".html");
+//            	writeHTML(html, ConfigParams.storageFolder + "/" + htmlParseData.getTitle() + idOfPage + ".html");
+            	String title = RegexMatcher.match(html, RegexMatcher.GC_TITLE),
+            		   comments = RegexMatcher.match(html, RegexMatcher.GC_COMMENT);
+            	if (!title.equals("") || !comments.equals("")) {
+            		writeHTML(html, "data/crawler4j/gcores/" + idOfPage + ".html");
+            		CSVResultWrite.appendCSV(ConfigParams.GC_OUTPUT_NAME, new String[] {title, comments});
+            	}
             }
             System.out.println("Number of outgoing links: " + links.size());
             System.out.println("===============================================");

@@ -5,6 +5,7 @@ import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
+import pers.jianfeic.util.csvio.CSVResultWrite;
 
 import static pers.jianfeic.mycralwer.ConfigParams.*;
 
@@ -74,6 +75,10 @@ public class Controller {
 		for (String seed : seeds) {
 			controller.addSeed(seed);
 		}
+		
+		// write the head
+		
+		CSVResultWrite.createCSV(ConfigParams.GC_OUTPUT_NAME, new String[] {"Title", "Comments"});
 
 		// Number of threads to use during crawling. Increasing this typically makes
 		// crawling faster. But crawling

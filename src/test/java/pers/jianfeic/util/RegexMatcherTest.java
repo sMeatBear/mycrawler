@@ -6,7 +6,7 @@ class RegexMatcherTest {
 
 	@Test
 	void testMatch() {
-		String content = "<p class=\"commentsMana_sortTabs\"><span>共 394 条评论</span>", regex = "(?<=<p class=\"commentsMana_sortTabs\"><span>)(.*)(?=<\\/span>)";
+		String content = "<p class=\"commentsMana_sortTabs\"><span>共 394 条评论</span>", regex = RegexMatcher.GC_COMMENT;
 		String res = RegexMatcher.match(content, regex);
 		System.out.println(res);
 	}
